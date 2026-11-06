@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#f5f7fb">
+    <meta
+      name="description"
+      content="透過互動圖解，逐步學習 Kruskal 最小生成樹與 Union-Find。"
+    >
+    <title>Kruskal 演算法｜最小生成樹互動教學</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="script.js" defer></script>
+  </head>
+  <body>
+    <main class="page-shell">
+      <header class="page-header">
+        <div>
+          <p class="eyebrow">ALGORITHM PLAYGROUND</p>
+          <h1>Kruskal 最小生成樹</h1>
+          <p class="page-intro">從最短的邊開始，逐步找出連接所有校園地點的最低成本路徑。</p>
+        </div>
+        <div class="algorithm-badge" aria-label="使用 Kruskal 演算法">
+          <span class="badge-dot"></span>
+          Kruskal's Algorithm
+        </div>
+      </header>
+
+      <section class="graph-card card" aria-labelledby="graph-title">
+        <div class="section-heading">
+          <div>
+            <p class="section-kicker">STEP 01 · GRAPH</p>
+            <h2 id="graph-title">校園路線圖</h2>
+          </div>
+          <p class="graph-hint">線上的數字代表路線權重</p>
+        </div>
+
+        <div class="graph-frame">
+          <svg
+            id="graph"
+            class="graph"
+            viewBox="0 0 700 400"
+            role="img"
+            aria-labelledby="graph-svg-title graph-svg-description"
+          >
+            <title id="graph-svg-title">六個校園地點與九條加權路線</title>
+            <desc id="graph-svg-description">節點代表校園地點，連線上的數字代表路線權重。圖形會隨演算法步驟更新。</desc>
+            <g id="edge-layer" aria-hidden="true"></g>
+            <g id="node-layer" aria-hidden="true"></g>
+          </svg>
+        </div>
+
+        <div class="legend" aria-label="圖例">
+          <div class="legend-item">
+            <span class="legend-line legend-current"></span>
+            <span>正在看的邊</span>
+          </div>
+          <div class="legend-item">
+            <span class="legend-line legend-accepted"></span>
+            <span>收下／在 MST 裡</span>
+          </div>
+          <div class="legend-item">
+            <span class="legend-line legend-rejected"></span>
+            <span>成環跳過</span>
+          </div>
+          <div class="legend-item">
+            <span class="legend-groups" aria-hidden="true">
+              <i></i><i></i><i></i>
+            </span>
+            <span>同色頂點 = 同一組</span>
+          </div>
+        </div>
+      </section>
+
+      <div class="details-grid">
+        <section class="card edges-card" aria-labelledby="edges-title">
+          <div class="section-heading compact-heading">
+            <div>
+              <p class="section-kicker">STEP 02 · SORTED EDGES</p>
+              <h2 id="edges-title">邊的清單</h2>
+            </div>
+            <span class="small-tag">權重由小到大</span>
+          </div>
+          <ol id="edge-list" class="edge-list" aria-label="依權重排序的邊"></ol>
+        </section>
+
+        <section class="card state-card" aria-labelledby="state-title">
+          <div class="section-heading compact-heading">
+            <div>
+              <p class="section-kicker">STEP 03 · UNION-FIND</p>
+              <h2 id="state-title">目前狀態</h2>
+            </div>
+            <span id="component-count" class="small-tag">6 個集合</span>
+          </div>
+
+          <p id="step-description" class="step-description" aria-live="polite">
+            按下「下一步」，從權重最小的邊開始檢查。
+          </p>
+
+          <div class="parent-heading">
+            <span>Union-Find 父節點陣列</span>
+            <code>P[X]</code>
+          </div>
+          <div id="parent-array" class="parent-array" aria-label="Union-Find 父節點陣列"></div>
+
+          <div class="groups-heading">目前的連通集合</div>
+          <div id="groups-list" class="groups-list" aria-live="polite"></div>
+
+          <div class="total-weight">
+            <span>MST 目前總權重</span>
+            <strong><span id="total-weight">0</span><small> / 13</small></strong>
+          </div>
+        </section>
+      </div>
+
+      <footer class="page-footer">
+        <span>每一步都檢查是否形成迴圈；不成環才加入最小生成樹。</span>
+        <span>6 個地點 · 9 條路線</span>
+      </footer>
+    </main>
+
+    <nav class="control-bar" aria-label="演算法步驟控制">
+      <div class="control-inner">
+        <div class="step-counter">
+          <strong id="step-count">0 / 6</strong>
+          <span>已檢查邊數</span>
+        </div>
+
+        <div
+          id="progress-track"
+          class="progress-track"
+          role="progressbar"
+          aria-label="演算法進度"
+          aria-valuemin="0"
+          aria-valuemax="6"
+          aria-valuenow="0"
+        >
+          <span id="progress-fill" class="progress-fill"></span>
+        </div>
+
+        <div class="control-buttons">
+          <button id="prev-button" class="button button-secondary" type="button" disabled>
+            <span aria-hidden="true">←</span> 上一步
+          </button>
+          <button id="next-button" class="button button-primary" type="button">
+            下一步 <span aria-hidden="true">→</span>
+          </button>
+          <button id="play-button" class="button button-secondary" type="button">
+            <span aria-hidden="true">▶</span> 自動播放
+          </button>
+          <button id="reset-button" class="button button-quiet" type="button">
+            <span aria-hidden="true">↺</span> 重來
+          </button>
+        </div>
+      </div>
+    </nav>
+  </body>
+</html>
